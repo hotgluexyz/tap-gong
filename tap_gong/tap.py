@@ -1,13 +1,21 @@
-"""Gong tap class."""
-
 from typing import List
+from pendulum import TRANSITION_ERROR
 
 from singer_sdk import Tap, Stream
 from singer_sdk import typing as th 
-from tap_gong.streams import CallsStream
+from tap_gong.streams import (
+    CallsStream,
+    TranscriptStream,
+    UsersStream,
+    FoldersStream,
+    )
 
-STREAM_TYPES = [CallsStream]
-
+STREAM_TYPES = [
+                CallsStream,
+                TranscriptStream,
+                UsersStream,
+                FoldersStream
+                ]
 
 class TapGong(Tap):
     """Gong tap class."""
