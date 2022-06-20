@@ -8,13 +8,15 @@ from tap_gong.streams import (
     TranscriptStream,
     UsersStream,
     FoldersStream,
+    WorkspacesStream
     )
 
 STREAM_TYPES = [
                 CallsStream,
                 TranscriptStream,
                 UsersStream,
-                FoldersStream
+                FoldersStream,
+                WorkspacesStream
                 ]
 
 class TapGong(Tap):

@@ -1,10 +1,5 @@
-"""Stream type classes for tap-gong."""
-
-from pathlib import Path
-import sched
-from typing import Any, Dict, Optional, Union, List, Iterable, cast
-import requests
-from singer_sdk import typing as th  # JSON Schema typing helpers
+from typing import Any, Dict, Optional
+from singer_sdk import typing as th 
 
 from tap_gong.client import GongStream
 
@@ -37,11 +32,7 @@ class CallsStream(GongStream):
     ).to_dict()
 
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
-
-        return {
-                    "callIds":     record["id"],
-                    "workspaceId": record["workspaceId"]
-                }
+        return {"callIds":record["id"]}
 
     def post_process(self, row: dict, context: Optional[dict] = None) -> Optional[dict]:
         if row.get("scheduled"):
@@ -107,11 +98,25 @@ class UsersStream(GongStream):
         )),
     ).to_dict()
 
+class WorkspacesStream(GongStream):
+    name = "workspaces"
+    path = "/v2/workspaces"
+    records_jsonpath = "$.workspaces[*]"
+
+    schema = th.PropertiesList(
+        th.Property("id",th.StringType),
+        th.Property("name",th.StringType),
+        th.Property("description",th.StringType),
+    ).to_dict()
+
+    def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
+        return {"workspaceId":record["id"]}
+
 class FoldersStream(GongStream):
     name = "folders"
     path = "/v2/library/folders"
     records_jsonpath = "$.folders[*]"
-    parent_stream_type = CallsStream
+    parent_stream_type = WorkspacesStream
 
     schema = th.PropertiesList(
         th.Property("id",th.StringType),
@@ -120,6 +125,7 @@ class FoldersStream(GongStream):
         th.Property("createdBy",th.StringType),
         th.Property("updated",th.DateTimeType),
     ).to_dict()
+
 
     def get_url_params(
         self, context: Optional[dict], next_page_token: Optional[Any]
