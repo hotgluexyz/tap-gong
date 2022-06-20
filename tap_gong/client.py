@@ -38,6 +38,11 @@ class GongStream(RESTStream):
         params: dict = {}
         if next_page_token:
             params["cursor"] = next_page_token
-        if self.replication_key:
-            params["fromDateTime"] = self.stream_state.get('replication_key_value')
+        
+        replication_key_value = self.stream_state.get('replication_key_value') 
+        start_date = self.config.get("start_date")
+        if replication_key_value:
+            params["fromDateTime"] = replication_key_value
+        elif start_date: 
+            params["fromDateTime"] = start_date
         return params
