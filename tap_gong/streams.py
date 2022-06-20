@@ -7,56 +7,31 @@ from singer_sdk import typing as th  # JSON Schema typing helpers
 
 from tap_gong.client import GongStream
 
-# TODO: Delete this is if not using json files for schema definition
-SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
-# TODO: - Override `UsersStream` and `GroupsStream` with your own stream definition.
-#       - Copy-paste as many times as needed to create multiple stream types.
-
-
-class UsersStream(GongStream):
-    """Define custom stream."""
-    name = "users"
-    path = "/users"
+class CallsStream(GongStream):
+    name = "calls"
+    path = "/v2/calls"
     primary_keys = ["id"]
-    replication_key = None
-    # Optionally, you may also use `schema_filepath` in place of `schema`:
-    # schema_filepath = SCHEMAS_DIR / "users.json"
+    replication_key = "scheduled"
+
     schema = th.PropertiesList(
-        th.Property("name", th.StringType),
-        th.Property(
-            "id",
-            th.StringType,
-            description="The user's system ID"
-        ),
-        th.Property(
-            "age",
-            th.IntegerType,
-            description="The user's age in years"
-        ),
-        th.Property(
-            "email",
-            th.StringType,
-            description="The user's email address"
-        ),
-        th.Property("street", th.StringType),
-        th.Property("city", th.StringType),
-        th.Property(
-            "state",
-            th.StringType,
-            description="State name in ISO 3166-2 format"
-        ),
-        th.Property("zip", th.StringType),
+        th.Property("clientUniqueId", th.StringType),
+        th.Property("customData",th.StringType),
+        th.Property("direction",th.StringType),
+        th.Property("duration",th.IntegerType),
+        th.Property("id",th.StringType),
+        th.Property("isPrivate",th.BooleanType),
+        th.Property("language",th.StringType),
+        th.Property("media",th.StringType),
+        th.Property("meetingUrl",th.StringType),
+        th.Property("primaryUserId",th.StringType),
+        th.Property("purpose",th.StringType),
+        th.Property("scheduled",th.DateTimeType),
+        th.Property("scope",th.StringType),
+        th.Property("sdrDisposition",th.StringType),
+        th.Property("started",th.DateTimeType),
+        th.Property("system",th.StringType),
+        th.Property("title",th.StringType),
+        th.Property("url",th.StringType),
+        th.Property("workspaceId",th.StringType),
     ).to_dict()
 
-
-class GroupsStream(GongStream):
-    """Define custom stream."""
-    name = "groups"
-    path = "/groups"
-    primary_keys = ["id"]
-    replication_key = "modified"
-    schema = th.PropertiesList(
-        th.Property("name", th.StringType),
-        th.Property("id", th.StringType),
-        th.Property("modified", th.DateTimeType),
-    ).to_dict()
