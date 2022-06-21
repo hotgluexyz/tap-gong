@@ -1,41 +1,21 @@
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
-from singer.schema import Schema
-from singer_sdk.authenticators import BearerTokenAuthenticator
-from singer_sdk.plugin_base import PluginBase as TapBaseClass
 from singer_sdk.streams import RESTStream
 
-from tap_gong.auth import GongAuthenticator
+from tap_gong.auth import OAuth2Authenticator
 
 
 class GongStream(RESTStream):
-    def __init__(
-        self,
-        tap: TapBaseClass,
-        name: Optional[str] = None,
-        schema: Optional[Union[Dict[str, Any], Schema]] = None,
-        path: Optional[str] = None,
-    ) -> None:
-        super().__init__(tap, name, schema, path)
-        # self.access_token = self.config["auth_token"]
 
     url_base = "https://api.gong.io"
     records_jsonpath = "$.calls[*]"
     next_page_token_jsonpath = "$.records.currentPageNumber"
 
-    # @property
-    # @cached
-    # def authenticator(self) -> GongAuthenticator:
-    #     """Return a new authenticator object."""
-    #     return GongAuthenticator.create_for_stream(self)
-
     @property
-    def authenticator(self) -> BearerTokenAuthenticator:
-
-        token = self.config.get("auth_token")
-        auth = BearerTokenAuthenticator(self, token=token)
-
-        return auth
+    def authenticator(self) -> OAuth2Authenticator:
+        """Return a new authenticator object."""
+        url = f"{self.url_base}/oauth2/generate-token"
+        return OAuth2Authenticator(self, self._tap.config, url)
 
     def get_url_params(
         self, context: Optional[dict], next_page_token: Optional[Any]
