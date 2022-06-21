@@ -1,5 +1,3 @@
-"""hubspot Authentication."""
-
 import json
 from datetime import datetime
 from typing import Optional
@@ -55,11 +53,10 @@ class OAuth2Authenticator(APIAuthenticatorBase):
 
     @property
     def oauth_request_body(self) -> dict:
-        """Define the OAuth request body for the hubspot API."""
+        """Define the OAuth request body for the gong API."""
         return {
             "client_id": self._tap._config["client_id"],
             "client_secret": self._tap._config["client_secret"],
-            "redirect_uri": self._tap._config["redirect_uri"],
             "refresh_token": self._tap._config["refresh_token"],
             "grant_type": "refresh_token",
         }
