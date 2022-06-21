@@ -12,20 +12,18 @@ class GongAuthenticator(OAuthAuthenticator, metaclass=SingletonMeta):
     @property
     def oauth_request_body(self) -> dict:
         """Define the OAuth request body for the Gong API."""
-        # TODO: Define the request body needed for the API.
         return {
-            'resource': 'https://analysis.windows.net/powerbi/api',
-            'scope': self.oauth_scopes,
-            'client_id': self.config["client_id"],
-            'username': self.config["username"],
-            'password': self.config["password"],
-            'grant_type': 'password',
+            "client_id": self.config["client_id"],
+            "response_type": "code",
+            "redirect_uri": "https://hotglue.xyz/callback",
+            "scope": self.oauth_scopes,
+            "state": "hotglue",
         }
 
     @classmethod
     def create_for_stream(cls, stream) -> "GongAuthenticator":
         return cls(
             stream=stream,
-            auth_endpoint="TODO: OAuth Endpoint URL",
-            oauth_scopes="TODO: OAuth Scopes",
+            auth_endpoint="https://app.gong.io/oauth2/authorize",
+            oauth_scopes="api:calls:read:transcript api:calls:read:basic api:calls:create api:users:read api:library:read api:workspaces:read",
         )
