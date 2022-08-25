@@ -3,13 +3,20 @@ from typing import Any, Dict, Optional
 from singer_sdk.streams import RESTStream
 
 from tap_gong.auth import OAuth2Authenticator
-
+from memoization import cached
+from pendulum import parse
 
 class GongStream(RESTStream):
 
     url_base = "https://api.gong.io"
     records_jsonpath = "$.calls[*]"
     next_page_token_jsonpath = "$.records.currentPageNumber"
+
+    @cached
+    def get_starting_time(self, context):
+        start_date = parse(self.config.get("start_date"))
+        rep_key = self.get_starting_timestamp(context)
+        return rep_key or start_date
 
     @property
     def authenticator(self) -> OAuth2Authenticator:
