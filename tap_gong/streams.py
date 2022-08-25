@@ -7,9 +7,12 @@ from tap_gong.client import GongStream
 
 class CallsStream(GongStream):
     name = "calls"
-    path = "/v2/calls"
+    path = "/v2/calls/extensive"
     primary_keys = ["id"]
     replication_key = "scheduled"
+    records_jsonpath = "$.calls[*].metaData"
+    next_page_token_jsonpath = "$.records.cursor"
+    rest_method = "POST"
 
     schema = th.PropertiesList(
         th.Property("clientUniqueId", th.StringType),
@@ -33,13 +36,16 @@ class CallsStream(GongStream):
         th.Property("workspaceId", th.StringType),
     ).to_dict()
 
+    def prepare_request_payload(self, context, next_page_token):
+        start_date = self.get_starting_time(context)
+        start_date = start_date.strftime("%Y-%m-%dT%H:%M:%S%z")
+        payload = {"filter": {"fromDateTime": start_date}}
+        if next_page_token:
+            payload["cursor"] = next_page_token
+        return payload
+
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         return {"callIds": record["id"]}
-
-    def post_process(self, row: dict, context: Optional[dict] = None) -> Optional[dict]:
-        if row.get("scheduled"):
-            row["scheduled"] = row["scheduled"].split(".")[0] + "Z"
-        return row
 
 
 class TranscriptStream(GongStream):
