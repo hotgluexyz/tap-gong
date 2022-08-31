@@ -1,6 +1,8 @@
-from typing import Any, Dict, Optional
+import requests
+from typing import Any, Dict, Optional, Iterable
 
 from singer_sdk import typing as th
+from singer_sdk.helpers.jsonpath import extract_jsonpath
 
 from tap_gong.client import GongStream
 
@@ -10,7 +12,7 @@ class CallsStream(GongStream):
     path = "/v2/calls/extensive"
     primary_keys = ["id"]
     replication_key = "scheduled"
-    records_jsonpath = "$.calls[*].metaData"
+    records_jsonpath = "$.calls[*]"
     next_page_token_jsonpath = "$.records.cursor"
     rest_method = "POST"
 
@@ -34,6 +36,23 @@ class CallsStream(GongStream):
         th.Property("title", th.StringType),
         th.Property("url", th.StringType),
         th.Property("workspaceId", th.StringType),
+        th.Property(
+            "parties",
+            th.ArrayType(
+                th.ObjectType(
+                    th.Property("affiliation", th.StringType),
+                    th.Property("emailAddress", th.StringType),
+                    th.Property("id", th.StringType),
+                    th.Property("methods", th.ArrayType(th.StringType)),
+                    th.Property("name", th.StringType),
+                    th.Property("phoneNumber", th.StringType),
+                    th.Property("speakerId", th.StringType),
+                    th.Property("title", th.StringType),
+                    th.Property("userId", th.StringType),
+                    th.Property("context", th.CustomType({"type": ["array", "string"]})),
+                ),
+            ),
+        ),
     ).to_dict()
 
     def prepare_request_payload(self, context, next_page_token):
@@ -42,7 +61,15 @@ class CallsStream(GongStream):
         payload = {"filter": {"fromDateTime": start_date}}
         if next_page_token:
             payload["cursor"] = next_page_token
+        payload["contentSelector"] = {"exposedFields": {"parties": True}}
         return payload
+
+    def parse_response(self, response: requests.Response) -> Iterable[dict]:
+        """Parse the response and return an iterator of result rows."""
+        for row in extract_jsonpath(self.records_jsonpath, input=response.json()):
+            output = row.get("metaData", {})
+            output["parties"] = row.get("parties")
+            yield output
 
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         return {"callIds": record["id"]}
