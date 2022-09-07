@@ -1,10 +1,11 @@
 from typing import Any, Dict, Optional
 
+from memoization import cached
+from pendulum import parse
 from singer_sdk.streams import RESTStream
 
 from tap_gong.auth import OAuth2Authenticator
-from memoization import cached
-from pendulum import parse
+
 
 class GongStream(RESTStream):
 

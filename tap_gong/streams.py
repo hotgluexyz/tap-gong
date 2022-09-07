@@ -1,6 +1,6 @@
-import requests
-from typing import Any, Dict, Optional, Iterable
+from typing import Any, Dict, Iterable, Optional
 
+import requests
 from singer_sdk import typing as th
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 
@@ -49,7 +49,9 @@ class CallsStream(GongStream):
                     th.Property("speakerId", th.StringType),
                     th.Property("title", th.StringType),
                     th.Property("userId", th.StringType),
-                    th.Property("context", th.CustomType({"type": ["array", "string"]})),
+                    th.Property(
+                        "context", th.CustomType({"type": ["array", "string"]})
+                    ),
                 ),
             ),
         ),
@@ -61,7 +63,10 @@ class CallsStream(GongStream):
         payload = {"filter": {"fromDateTime": start_date}}
         if next_page_token:
             payload["cursor"] = next_page_token
-        payload["contentSelector"] = {"exposedFields": {"parties": True}}
+        payload["contentSelector"] = {
+            "context": "Basic",
+            "exposedFields": {"parties": True},
+        }
         return payload
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
