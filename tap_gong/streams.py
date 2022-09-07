@@ -36,6 +36,7 @@ class CallsStream(GongStream):
         th.Property("title", th.StringType),
         th.Property("url", th.StringType),
         th.Property("workspaceId", th.StringType),
+        th.Property("context", th.CustomType({"type": ["array", "string"]})),
         th.Property(
             "parties",
             th.ArrayType(
@@ -74,6 +75,7 @@ class CallsStream(GongStream):
         for row in extract_jsonpath(self.records_jsonpath, input=response.json()):
             output = row.get("metaData", {})
             output["parties"] = row.get("parties")
+            output["context"] = row.get("context")
             yield output
 
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
