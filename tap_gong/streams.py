@@ -3,6 +3,7 @@ from typing import Any, Dict, Iterable, Optional
 import requests
 from singer_sdk import typing as th
 from singer_sdk.helpers.jsonpath import extract_jsonpath
+from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 
 from tap_gong.client import GongStream
 
@@ -81,6 +82,20 @@ class CallsStream(GongStream):
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
         return {"callIds": record["id"]}
 
+    def validate_response(self, response: requests.Response) -> None:
+        """Validate HTTP response."""
+        if (
+            response.status_code in self.extra_retry_statuses
+            or 500 <= response.status_code < 600
+        ):
+            msg = self.response_error_message(response)
+            raise RetriableAPIError(msg, response)
+        elif response.status_code==404:
+            self.logger.warning(response.json().get("errors"))
+            return
+        elif 400 <= response.status_code < 500:
+            msg = self.response_error_message(response)
+            raise FatalAPIError(msg)
 
 class TranscriptStream(GongStream):
     name = "transcripts"

@@ -81,10 +81,8 @@ class OAuth2Authenticator(APIAuthenticatorBase):
         return self.oauth_request_body
 
     @property
-    def auth_params(self) -> dict:
-
+    def oauth_params(self) -> dict:
         params = {}
-
         params["grant_type"] = "refresh_token"
         params["refresh_token"] = self._tap._config["refresh_token"]
 
@@ -103,7 +101,7 @@ class OAuth2Authenticator(APIAuthenticatorBase):
 
         token_response = requests.post(
             self.auth_endpoint,
-            params=self.auth_params,
+            params=self.oauth_params,
             auth=HTTPBasicAuth(client_id, client_secret),
         )
         try:
