@@ -56,20 +56,19 @@ class OAuth2Authenticator(APIAuthenticatorBase):
         """Define the OAuth request body for the gong API."""
         return {
             "client_id": self._tap._config["client_id"],
-            "client_secret": self._tap._config["client_secret"],
+            "client_secret": str(self._tap._config["client_secret"]),
             "refresh_token": self._tap._config["refresh_token"],
             "grant_type": "refresh_token",
         }
 
     def is_token_valid(self) -> bool:
-        return True
-        # access_token = self._tap._config.get("access_token")
-        # now = round(datetime.utcnow().timestamp())
-        # expires_in = self._tap._config.get("expires_in")
+        access_token = self._tap._config.get("access_token")
+        now = round(datetime.utcnow().timestamp())
+        expires_in = self._tap._config.get("expires_in")
 
-        # return not bool(
-        #     (not access_token) or (not expires_in) or ((expires_in - now) < 60)
-        # )
+        return not bool(
+            (not access_token) or (not expires_in) or ((int(expires_in) - now) < 120)
+        )
 
     @property
     def oauth_request_payload(self) -> dict:
@@ -80,14 +79,6 @@ class OAuth2Authenticator(APIAuthenticatorBase):
         """
         return self.oauth_request_body
 
-    @property
-    def oauth_params(self) -> dict:
-        params = {}
-        params["grant_type"] = "refresh_token"
-        params["refresh_token"] = self._tap._config["refresh_token"]
-
-        return params
-
     def update_access_token(self) -> None:
         """Update `access_token` along with: `last_refreshed` and `expires_in`.
 
@@ -96,13 +87,14 @@ class OAuth2Authenticator(APIAuthenticatorBase):
         """
         request_time = round(datetime.utcnow().timestamp())
 
-        client_secret = self._tap._config["client_secret"]
+        client_secret = str(self._tap._config["client_secret"])
         client_id = self._tap._config["client_id"]
 
+        auth_request_payload = self.oauth_request_payload
         token_response = requests.post(
             self.auth_endpoint,
-            params=self.oauth_params,
-            auth=HTTPBasicAuth(client_id, client_secret),
+            data=auth_request_payload,
+            auth=HTTPBasicAuth(client_id, client_secret)
         )
         try:
             token_response.raise_for_status()
