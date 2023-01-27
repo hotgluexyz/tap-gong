@@ -55,10 +55,10 @@ class OAuth2Authenticator(APIAuthenticatorBase):
     def oauth_request_body(self) -> dict:
         """Define the OAuth request body for the gong API."""
         return {
-            "client_id": self._tap._config["client_id"],
-            "client_secret": str(self._tap._config["client_secret"]),
-            "refresh_token": self._tap._config["refresh_token"],
+            # "client_id": self._tap._config["client_id"],
+            # "client_secret": str(self._tap._config["client_secret"]),
             "grant_type": "refresh_token",
+            "refresh_token": self._tap._config["refresh_token"],
         }
 
     def is_token_valid(self) -> bool:
@@ -95,7 +95,8 @@ class OAuth2Authenticator(APIAuthenticatorBase):
             self.auth_endpoint,
             data=auth_request_payload,
             auth=HTTPBasicAuth(client_id, client_secret)
-        )
+            )
+
         try:
             token_response.raise_for_status()
             self.logger.info("OAuth authorization attempt was successful.")

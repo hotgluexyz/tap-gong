@@ -22,7 +22,7 @@ class GongStream(RESTStream):
     @property
     def authenticator(self) -> OAuth2Authenticator:
         """Return a new authenticator object."""
-        url = f"{self.url_base}/oauth2/generate-token"
+        url = "https://app.gong.io/oauth2/generate-token"
         return OAuth2Authenticator(self, self._tap.config, url)
 
     def get_url_params(
