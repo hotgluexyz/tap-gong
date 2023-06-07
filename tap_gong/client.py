@@ -5,7 +5,8 @@ from pendulum import parse
 from singer_sdk.streams import RESTStream
 
 from tap_gong.auth import OAuth2Authenticator
-
+import requests
+from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 
 class GongStream(RESTStream):
 
@@ -39,3 +40,24 @@ class GongStream(RESTStream):
         elif start_date:
             params["fromDateTime"] = start_date
         return params
+    
+    def validate_response(self, response: requests.Response) -> None:
+
+        # Configurable maximum wait time in hours
+        max_wait_time_hours = self.config.get("wait_hour",1)
+        #Not getting header with Retry-After for now. Adding check for it.
+        if "Retry-After" in response.headers:
+            retry_after = response.headers['Retry-After']
+            wait_time = int(retry_after)
+            if wait_time > (max_wait_time_hours * 3600):
+                raise Exception(f"Daily limit exceeded. Wait time ({wait_time} seconds) exceeds {max_wait_time_hours} hour(s)")
+
+        if (
+            response.status_code in self.extra_retry_statuses
+            or 500 <= response.status_code < 600
+        ):
+            msg = self.response_error_message(response)
+            raise RetriableAPIError(msg, response)
+        elif 400 <= response.status_code < 500:
+            msg = self.response_error_message(response)
+            raise FatalAPIError(msg)
