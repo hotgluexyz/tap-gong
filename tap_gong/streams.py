@@ -84,6 +84,7 @@ class CallsStream(GongStream):
 
     def validate_response(self, response: requests.Response) -> None:
         """Validate HTTP response."""
+        self.check_retry_after(response)
         if (
             response.status_code in self.extra_retry_statuses
             or 500 <= response.status_code < 600
