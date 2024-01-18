@@ -10,9 +10,13 @@ from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 
 class GongStream(RESTStream):
 
-    url_base = "https://api.gong.io"
     records_jsonpath = "$.calls[*]"
     next_page_token_jsonpath = "$.records.currentPageNumber"
+
+    @property
+    def url_base(self) -> str:
+        """Return the API URL root, configurable via tap settings."""
+        return self.config.get("api_base_url_for_customer", "https://api.gong.io")
 
     @cached
     def get_starting_time(self, context):
@@ -23,7 +27,7 @@ class GongStream(RESTStream):
     @property
     def authenticator(self) -> OAuth2Authenticator:
         """Return a new authenticator object."""
-        url = "https://app.gong.io/oauth2/generate-token"
+        url = "https://app.gong.io/oauth2/generate-customer-token"
         return OAuth2Authenticator(self, self._tap.config, url)
 
     def get_url_params(

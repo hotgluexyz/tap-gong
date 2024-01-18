@@ -111,5 +111,7 @@ class OAuth2Authenticator(APIAuthenticatorBase):
         self._tap._config["access_token"] = token_json["access_token"]
         self._tap._config["expires_in"] = expires_in
         self._tap._config["refresh_token"] = token_json["refresh_token"]
+        # Add the api_base_url if missing
+        self._tap._config["api_base_url_for_customer"] = token_json.get("api_base_url_for_customer")
         with open(self._tap.config_file, "w") as outfile:
             json.dump(self._tap._config, outfile, indent=4)
