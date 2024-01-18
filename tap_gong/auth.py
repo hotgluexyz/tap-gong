@@ -93,7 +93,7 @@ class OAuth2Authenticator(APIAuthenticatorBase):
         auth_request_payload = self.oauth_request_payload
         token_response = requests.post(
             self.auth_endpoint,
-            data=auth_request_payload,
+            params=auth_request_payload,
             auth=HTTPBasicAuth(client_id, client_secret)
             )
 
