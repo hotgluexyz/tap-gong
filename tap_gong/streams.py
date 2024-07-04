@@ -57,6 +57,13 @@ class CallsStream(GongStream):
                 ),
             ),
         ),
+        th.Property(
+            "media_urls",
+            th.ObjectType(
+                th.Property("audioUrl", th.StringType),
+                th.Property("videoUrl", th.StringType),
+            ),
+        ),
     ).to_dict()
 
     def prepare_request_payload(self, context, next_page_token):
@@ -67,7 +74,10 @@ class CallsStream(GongStream):
             payload["cursor"] = next_page_token
         payload["contentSelector"] = {
             "context": "Basic",
-            "exposedFields": {"parties": True},
+            "exposedFields": {
+                "parties": True,
+                "media": True,
+            },
         }
         return payload
 
@@ -77,6 +87,8 @@ class CallsStream(GongStream):
             output = row.get("metaData", {})
             output["parties"] = row.get("parties")
             output["context"] = row.get("context")
+            #We already have media from metaData, we need it in a separate field
+            output["media_urls"] = row.get("media")
             yield output
 
     def get_child_context(self, record: dict, context: Optional[dict]) -> dict:
