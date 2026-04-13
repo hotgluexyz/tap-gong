@@ -2,11 +2,11 @@ from typing import Any, Dict, Optional
 
 from memoization import cached
 from pendulum import parse
-from singer_sdk.streams import RESTStream
+from hotglue_singer_sdk.streams import RESTStream
 
 from tap_gong.auth import OAuth2Authenticator
 import requests
-from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
+from hotglue_singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 
 class GongStream(RESTStream):
 
@@ -28,7 +28,7 @@ class GongStream(RESTStream):
     def authenticator(self) -> OAuth2Authenticator:
         """Return a new authenticator object."""
         url = "https://app.gong.io/oauth2/generate-customer-token"
-        return OAuth2Authenticator(self, self._tap.config, url)
+        return OAuth2Authenticator(self, auth_endpoint=url)
 
     def get_url_params(
         self, context: Optional[dict], next_page_token: Optional[Any]

@@ -2,11 +2,9 @@
 
 `tap-gong` is a Singer tap for Gong.
 
-Built with the [Meltano Tap SDK](https://sdk.meltano.com) for Singer Taps.
+Built with the [Hotglue Singer SDK](https://github.com/hotglueHQ/HotglueSingerSDK) for Singer Taps.
 
 ## Installation
-
-- [ ] `Developer TODO:` Update the below as needed to correctly describe the install procedure. For instance, if you do not have a PyPi repo, or if you want users to directly install from your git repo, you can modify this step as appropriate.
 
 ```bash
 pipx install tap-gong
@@ -16,13 +14,32 @@ pipx install tap-gong
 
 ### Accepted Config Options
 
-- [ ] `Developer TODO:` Provide a list of config options accepted by the tap.
+| Setting | Required | Default | Description |
+|---|---|---|---|
+| `access_token` | Yes | — | Gong OAuth2 access token |
+| `client_id` | Yes | — | Gong OAuth2 client ID |
+| `client_secret` | Yes | — | Gong OAuth2 client secret |
+| `refresh_token` | No | — | Gong OAuth2 refresh token. Required when using token refresh. Updated automatically after each refresh. |
+| `start_date` | No | — | Earliest date to sync records from, in ISO 8601 format (e.g. `2024-01-01T00:00:00Z`) |
+| `api_base_url_for_customer` | No | `https://api.gong.io` | Override the Gong API base URL (set automatically on token refresh) |
+| `wait_hour` | No | `1` | Maximum number of hours to wait when Gong returns a rate-limit response before raising an error |
 
-A full list of supported settings and capabilities for this
-tap is available by running:
+A full list of supported settings and capabilities is also available by running:
 
 ```bash
 tap-gong --about
+```
+
+### Sample `config.json`
+
+```json
+{
+  "client_id": "your-client-id",
+  "client_secret": "your-client-secret",
+  "access_token": "your-access-token",
+  "refresh_token": "your-refresh-token",
+  "start_date": "2024-01-01T00:00:00Z"
+}
 ```
 
 ### Configure using environment variables
@@ -48,8 +65,6 @@ tap-gong --config CONFIG --discover > ./catalog.json
 ```
 
 ## Developer Resources
-
-- [ ] `Developer TODO:` As a first step, scan the entire project for the text "`TODO:`" and complete any recommended steps, deleting the "TODO" references once completed.
 
 ### Initialize your Development Environment
 
