@@ -28,7 +28,7 @@ class GongStream(RESTStream):
     def authenticator(self) -> OAuth2Authenticator:
         """Return a new authenticator object."""
         url = "https://app.gong.io/oauth2/generate-customer-token"
-        return OAuth2Authenticator(self, self._tap.config, url)
+        return OAuth2Authenticator(self, auth_endpoint=url)
 
     def get_url_params(
         self, context: Optional[dict], next_page_token: Optional[Any]

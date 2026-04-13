@@ -21,7 +21,7 @@ pipx install tap-gong
 | `client_secret` | Yes | — | Gong OAuth2 client secret |
 | `refresh_token` | No | — | Gong OAuth2 refresh token. Required when using token refresh. Updated automatically after each refresh. |
 | `start_date` | No | — | Earliest date to sync records from, in ISO 8601 format (e.g. `2024-01-01T00:00:00Z`) |
-| `api_base_url_for_customer` | No | `https://api.gong.io` | Override the Gong API base URL (set automatically by Gong on token refresh for some customers) |
+| `api_base_url_for_customer` | No | `https://api.gong.io` | Override the Gong API base URL (set automatically on token refresh) |
 | `wait_hour` | No | `1` | Maximum number of hours to wait when Gong returns a rate-limit response before raising an error |
 
 A full list of supported settings and capabilities is also available by running:
