@@ -1,9 +1,10 @@
 from typing import List
 
 from pendulum import TRANSITION_ERROR
-from singer_sdk import Stream, Tap
-from singer_sdk import typing as th
+from hotglue_singer_sdk import Stream, Tap
+from hotglue_singer_sdk import typing as th
 
+from tap_gong.auth import OAuth2Authenticator
 from tap_gong.streams import (
     CallsStream,
     FoldersStream,
@@ -52,6 +53,11 @@ class TapGong(Tap):
         th.Property("client_id", th.StringType, required=True),
         th.Property("client_secret", th.StringType, required=True),
     ).to_dict()
+
+    @classmethod
+    def access_token_support(cls, connector=None):
+        url = "https://app.gong.io/oauth2/generate-customer-token"
+        return (OAuth2Authenticator, url)
 
     def discover_streams(self) -> List[Stream]:
         """Return a list of discovered streams."""

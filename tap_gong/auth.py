@@ -4,8 +4,8 @@ from typing import Optional
 
 import requests
 from requests.auth import HTTPBasicAuth
-from singer_sdk.authenticators import APIAuthenticatorBase
-from singer_sdk.streams import Stream as RESTStreamBase
+from hotglue_singer_sdk.authenticators import APIAuthenticatorBase
+from hotglue_singer_sdk.streams import RESTStream as RESTStreamBase
 
 
 class OAuth2Authenticator(APIAuthenticatorBase):
@@ -79,7 +79,7 @@ class OAuth2Authenticator(APIAuthenticatorBase):
         """
         return self.oauth_request_body
 
-    def update_access_token(self) -> None:
+    def update_access_token_locally(self) -> None:
         """Update `access_token` along with: `last_refreshed` and `expires_in`.
 
         Raises:

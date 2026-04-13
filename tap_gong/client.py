@@ -2,11 +2,11 @@ from typing import Any, Dict, Optional
 
 from memoization import cached
 from pendulum import parse
-from singer_sdk.streams import RESTStream
+from hotglue_singer_sdk.streams import RESTStream
 
 from tap_gong.auth import OAuth2Authenticator
 import requests
-from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
+from hotglue_singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 
 class GongStream(RESTStream):
 

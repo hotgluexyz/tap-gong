@@ -1,9 +1,9 @@
 from typing import Any, Dict, Iterable, Optional
 
 import requests
-from singer_sdk import typing as th
-from singer_sdk.helpers.jsonpath import extract_jsonpath
-from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
+from hotglue_singer_sdk import typing as th
+from hotglue_singer_sdk.helpers.jsonpath import extract_jsonpath
+from hotglue_singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 
 from tap_gong.client import GongStream
 
